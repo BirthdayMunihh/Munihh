@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=1200, initial-scale=0.35, maximum-scale=1.0, user-scalable=yes">
+
+    <title>Munih Wrapped</title>
+    <style>
+        /* CSS from the previous step goes here */
+        :root {
+            --primary-dark: #121212;
+            --secondary-dark: #1f1f1f;
+            --spotify-purple: #5b2c93;
+            --spotify-light-purple: #8e6cbe;
+            --spotify-blue: #448aff;
+            --spotify-green: #1DB954;
+            --spotify-orange: #ffb74d;
+            --spotify-limegreen: #cddc39;
+            --text-white: #ffffff;
+            --text-light-gray: #b3b3b3;
+            --font-stack: 'Helvetica Neue', 'Arial', sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-stack);
+        }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            background-color: var(--primary-dark);
+            color: var(--text-white);
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        h1, h2, h3 {
+            font-weight: 900;
+        }
+
+        .page {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 20px 50px;
+            position: relative;
+            text-align: center;
+        }
+
+        /* --- Login Page (Page 0) Styling --- */
+        #login-page {
+            background: radial-gradient(circle at 10% 20%, var(--spotify-purple) 0%, var(--primary-dark) 80%);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .login-container {
+            width: 90%;
+            max-width: 400px;
+            z-index: 10;
+        }
+
+        .login-container h1 {
+            font-size: clamp(1.5em, 5vw, 2.5em);
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .login-input {
+            width: 100%;
+            padding: 18px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 8px;
+            background-color: var(--secondary-dark);
+            color: var(--text-white);
+            font-size: 1em;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+            transition: background-color 0.3s;
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 15px;
+            margin-top: 20px;
+            border: none;
+            border-radius: 50px;
+            background-color: var(--spotify-blue);
+            color: var(--text-white);
+            font-size: 1.1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.1s;
+        }
+
+        .login-btn:hover {
+            background-color: #5d9aff;
+        }
+        .login-btn:active {
+            transform: scale(0.98);
+        }
+
+        .bubble {
+            position: absolute;
+            background: var(--spotify-light-purple);
+            border-radius: 50%;
+            opacity: 0.2;
+            filter: blur(80px);
+            animation: float 15s infinite ease-in-out alternate;
+        }
+        #login-page .bubble:nth-child(1) { top: 5%; left: 10%; width: 150px; height: 150px; }
+        #login-page .bubble:nth-child(2) { bottom: 10%; right: 5%; width: 250px; height: 250px; background: var(--spotify-blue); animation-delay: -3s; }
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(20px, 30px); }
+        }
+
+        /* --- Main Application Layout --- */
+        #content-wrapper {
+            display: grid;
+            grid-template-columns: 80px 1fr;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sidebar {
+            background-color: var(--primary-dark);
+            padding: 10px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-right: 1px solid #333;
+            overflow-y: auto;
+        }
+
+        .sidebar-icon {
+            width: 50px;
+            height: 50px;
+            margin: 15px 0;
+            background-color: var(--secondary-dark);
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-light-gray);
+            font-size: 1.5em;
+            transition: color 0.2s, background-color 0.2s;
+        }
+
+        .sidebar-icon:hover {
+            color: var(--text-white);
+            background-color: #282828;
+        }
+
+        .main-content {
+            overflow-y: auto;
+            background-color: var(--secondary-dark);
+        }
+
+        /* --- Content Section Styles --- */
+        #now-playing-page {
+            background-color: #282828;
+            align-items: flex-start;
+            text-align: left;
+            padding-top: 50px;
+        }
+
+        #now-playing-page h2 {
+            font-size: clamp(1.8em, 4vw, 3em);
+            margin-bottom: 20px;
+        }
+
+        .hero-section {
+            display: flex;
+            gap: 40px;
+            align-items: flex-start;
+            width: 100%;
+            max-width: 1000px;
+            margin-bottom: 40px;
+        }
+
+        .couple-image {
+            min-width: 250px;
+            height: 250px;
+            border-radius: 10px;
+            object-fit: cover;
+            background-color: var(--spotify-light-purple);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+        }
+
+
+        .description {
+            flex-grow: 1;
+            font-size: 1.1em;
+            line-height: 1.6;
+            color: var(--text-light-gray);
+        }
+
+        .card-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr); /* 6 foto sejajar */
+    gap: 20px;
+    width: 100%;
+    max-width: 1200px; /* sesuaikan agar 6 muat */
+    margin-top: 20px;
+}
+
+
+        .memory-card {
+            background-color: var(--primary-dark);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+        
+        /* Page 2: Search/Memories Menu */
+        #search-menu-page {
+            justify-content: center;
+            align-items: center;
+            background-color: var(--primary-dark);
+        }
+        
+        .search-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            width: 100%;
+            max-width: 800px;
+            margin-top: 40px;
+        }
+
+        .search-card {
+            padding: 50px;
+            border: none;
+            border-radius: 10px;
+            color: var(--text-white);
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            text-align: center;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .search-card:hover { transform: translateY(-5px); opacity: 0.9; }
+
+        #memories-card { background: linear-gradient(135deg, #f06292, #ffb74d); }
+        #message-card { background: linear-gradient(135deg, #66bb6a, #cddc39); }
+        #playlist-card { background: linear-gradient(135deg, #42a5f5, #29b6f6); }
+        #wrapped-card { background: linear-gradient(135deg, #ba68c8, #ce93d8); }
+
+        /* Page 3: Memories Detail */
+        #memories-page {
+            align-items: flex-start;
+            text-align: left;
+            background-color: var(--primary-dark);
+        }
+       .mood-grid {
+    display: flex;
+    gap: 20px;                 /* jarak ikut diperbesar */
+    justify-content: center;
+    align-items: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 12px;
+}
+
+.mood-card {
+    width: 190px;              /* ⬅️ dari 95px → 190px */
+    background: #1a1a1a;
+    border: 2px solid #2f2f2f;
+    border-radius: 18px;
+    padding: 12px;
+    text-align: center;
+}
+
+.mood-card video {
+    width: 100%;
+    height: 240px;             /* ⬅️ dari 120px → 240px */
+    object-fit: cover;
+    border-radius: 14px;
+}
+
+.mood-card p {
+    margin-top: 8px;
+    font-size: 16px;           /* teks ikut membesar */
+    color: #fff;
+    font-weight: 500;
+}
+
+
+
+        /* Page 4: Our Love Playlist */
+        #playlist-page {
+            align-items: flex-start;
+            text-align: left;
+            background-color: #282828;
+        }
+        .mood-card {
+    border: none;          /* hilangkan border */
+    width: 80%;            /* perkecil jadi 80% */
+    margin: 0 auto;        /* tetap center */
+    text-align: center;
+}
+
+.mood-card img {
+    width: 100%;
+    height: auto;
+    
+    display: block;
+}
+
+
+        .playlist-info {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            align-items: flex-end;
+        }
+
+        .album-art {
+            width: 200px;
+            height: 200px;
+            background-color: 
+            border-radius: 10px;
+            box-shadow: 0 0px 0px rgba(0, 0, 0, 0.7);
+        }
+
+        .playlist-header h3 { color: var(--text-light-gray); font-weight: 400; font-size: 1em; }
+        .playlist-header h1 { font-size: 3em; margin: 5px 0; }
+
+        .song-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .song-list th, .song-list td {
+            text-align: left;
+            padding: 15px 0;
+            border-bottom: 1px solid #333;
+        }
+        .song-list th { color: var(--text-light-gray); font-weight: 400; }
+        .song-list tr:hover { background-color: #333; cursor: pointer; }
+
+        /* Page 5: Message */
+        #message-page {
+            background-color: var(--spotify-purple);
+            align-items: center;
+            justify-content: center;
+            padding: 50px 10%;
+        }
+
+        .message-box {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 40px;
+            border-radius: 15px;
+            max-width: 800px;
+            text-align: left;
+            line-height: 1.8;
+            font-size: 1.1em;
+        }
+        .message-box p { margin-bottom: 15px; }
+
+        /* Page 6-7: Wrapped (Dynamic/Full-Screen Transition) */
+        .wrapped-page {
+    display: flex;          /* Pastikan display flex aktif */
+    flex-direction: column; /* Menyusun konten secara vertikal */
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    min-height: 100vh;      /* Memenuhi tinggi layar */
+    width: 100%;
+    background-color: #ff0044; 
+    transition: background-color 0.5s;
+    padding: 20px;
+}
+
+#wrapped-page-1 h1 { 
+    font-size: clamp(4em, 15vw, 8em); /* Responsif: mengecil di layar kecil */
+    line-height: 1; 
+}
+
+#wrapped-page-1 h2 { 
+    font-size: clamp(1.5em, 5vw, 2.5em); 
+    margin-top: 20px; 
+}
+
+#wrapped-page-2 { 
+    background-color: #38b6ff; 
+}
+
+.countdown-timer {
+    display: flex;
+    flex-wrap: wrap;        /* Agar tidak berantakan jika layar sempit */
+    justify-content: center;
+    gap: 30px;              /* Jarak antar unit diperlebar agar lega */
+    margin-top: 40px;
+    font-size: 1.2rem;      /* Ukuran label (years, months, dll) */
+}
+
+.timer-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.timer-unit span { 
+    display: block; 
+    font-size: clamp(2em, 8vw, 4em); /* Angka dibuat besar dan tebal */
+    font-weight: 900; 
+    line-height: 1;
+    margin-bottom: 5px;
+}
+        /* Page 8: Things I Love */
+        #love-list-page {
+            background-color: #e53935; /* Solid Red */
+            align-items: flex-start;
+            text-align: left;
+            padding-top: 50px;
+        }
+        .love-item {
+            display: flex;
+            margin-bottom: 25px;
+            align-items: baseline;
+            font-size: 1.3em;
+            line-height: 1.4;
+        }
+        .love-item span.number {
+            font-size: 3em;
+            font-weight: 900;
+            margin-right: 15px;
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Page 9: Top Moments */
+      #moments-page {
+    background: linear-gradient(to right, #441a7c, #2b0b4f); /* Purple/Blue Gradient */
+    display: flex;
+    flex-direction: column;
+    align-items: center;    /* Berubah dari flex-start ke center agar di tengah */
+    text-align: center;     /* Berubah dari left ke center */
+    padding-top: 50px;
+    min-height: 100vh;
+}
+
+/* Container untuk membungkus baris foto */
+.moment-container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.moment-row {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;      /* Memaksa tetap 1 baris */
+    justify-content: center;
+    gap: 20px;
+}
+
+.moment-item {
+    display: flex;
+    flex-direction: column; /* Mengatur judul di bawah/atas foto */
+    align-items: right;
+    margin-bottom: 30px;
+    width: 300px;           /* UKURAN ITEM JADI 300px */
+}
+
+.moment-photo {
+    width: 600px;           /* LEBAR FOTO 300px */
+    height: 700px;          /* Tinggi proporsional (bisa disesuaikan) */
+    object-fit: cover;
+    border-radius: 20px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+}
+
+.moment-item .number {
+    font-size: 4em;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 10px;    /* Memberi jarak ke foto */
+}
+
+.moment-details h4 { 
+    font-size: 1.5em; 
+    color: white;
+    margin-top: 15px;
+}
+
+        /* Final Page */
+        #final-page {
+            background: linear-gradient(135deg, #191970, #4b0082);
+        }
+        body {
+    min-width: 1200px;
+}
+
+    </style>
+</head>
+<body>
+
+    <div id="login-page" class="page">
+        <div class="bubble"></div>
+        <div class="bubble"></div>
+        <img src="1.png" alt="Spotify Logo" style="width: 50px; margin-bottom: 20px; filter: invert(1);">
+        <div class="login-container">
+            <h1>Munih Wrapped!</h1>
+            <input type="text" id="meet-date" class="login-input" placeholder="Our first meet" value="Munih Ramadhani" readonly>
+            <input type="password" id="password-input" class="login-input" placeholder="Password">
+            <button class="login-btn" onclick="handleLogin()">Log In</button>
+        </div>
+    </div>
+
+    <div id="content-wrapper" style="display: none;">
+        <div class="sidebar">
+            <div class="sidebar-icon" onclick="scrollToSection('now-playing-page')">🏠</div>
+            <div class="sidebar-icon" onclick="scrollToSection('search-menu-page')">🔍</div>
+            <div class="sidebar-icon" onclick="scrollToSection('memories-page')">📷</div>
+            <div class="sidebar-icon" onclick="scrollToSection('playlist-page')">🎧</div>
+            <div class="sidebar-icon" onclick="scrollToSection('message-page')">✉️</div>
+            <div class="sidebar-icon" onclick="scrollToSection('wrapped-page-1')">🎁</div>
+        </div>
+
+        <div class="main-content">
+
+            <section id="now-playing-page" class="page">
+                <h2 style="font-size: 2.5em;">Now Playing: Us</h2>
+                <div class="30%">
+                    <img class="couple-image" src="11.JPEG" alt="">
+                    <div class="description">
+                        <p>“This website was created especially for you, as a small way to celebrate the most special day—your birthday. Every page is made to capture and preserve all the moments from the past year, just like every moment we have shared together. Happy Birthday, my love. May this new year of your life be filled with happiness, success, and beautiful moments, and may I always be by your side to celebrate them with you.”</p>
+                    </div>
+                </div>
+
+                <h3 style="align-self: flex-start; margin-top: 20px;">Recently Moments</h3>
+                <div class="card-grid">
+                    <div class="memory-card">
+                        <img src="13.jpeg" alt="Happy">
+                        <p>Happy</p>
+                        <small></small>
+                    </div>
+                    <div class="memory-card">
+                        <img src="22.jpeg" alt="Sad">
+                        <p>Sad</p>
+                    </div>
+                    <div class="memory-card">
+                        <img src="21.jpeg" alt="Angry">
+                        <p>Angry</p>
+                    </div>
+                    <div class="memory-card">
+                        <img src="19.jpeg" alt="Bored">
+                        <p>Bored</p>
+                    </div>
+                    <div class="memory-card">
+                        <img src="17.jpeg" alt="confused">
+                        <p>Confused</p>
+                    </div>
+                    <div class="memory-card">
+                        <img src="15.jpeg" alt="confused">
+                        <p>Proud</p>
+                    </div>
+                </div>
+            </section>
+
+            <section id="search-menu-page" class="page">
+                <h2 style="font-size: 3em;">Search</h2>
+                <input type="text" class="login-input" style="max-width: 500px;" placeholder="Search: Artists, songs or podcasts">
+
+                <div class="search-grid">
+                    <div class="search-card" id="memories-card" onclick="scrollToSection('memories-page')">Memories</div>
+                    <div class="search-card" id="message-card" onclick="scrollToSection('message-page')">Message</div>
+                    <div class="search-card" id="playlist-card" onclick="scrollToSection('playlist-page')">Love Playlist</div>
+                    <div class="search-card" id="wrapped-card" onclick="scrollToSection('wrapped-page-1')">Wrapped</div>
+                </div>
+            </section>
+
+            <section id="memories-page" class="page">
+                <h2 style="font-size: 3em;">Memories</h2>
+                <h3 style="margin-top: 20px;">Favorite Pictures</h3>
+                <div class="card-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                   <div class="mood-grid">
+    <div class="mood-card">
+        <video autoplay muted loop playsinline>
+            <source src="31.mp4" type="video/mp4">
+        </video>
+        <p>Happy</p>
+    </div>
+
+    <div class="mood-card">
+        <video autoplay muted loop playsinline>
+            <source src="32.mp4" type="video/mp4">
+        </video>
+        <p>Shy</p>
+    </div>
+
+    <div class="mood-card">
+        <video autoplay muted loop playsinline>
+            <source src="33.mp4" type="video/mp4">
+        </video>
+        <p>Happy</p>
+    </div>
+
+    <div class="mood-card">
+        <video autoplay muted loop playsinline>
+            <source src="34.mp4" type="video/mp4">
+        </video>
+        <p>Shy</p>
+    </div>
+</div>
+
+                    </div>
+            </section>
+
+            <section id="playlist-page" class="page">
+                <div class="playlist-info">
+                    <div class="album-art">
+
+<div class="mood-card">
+    <img src="23.jpeg" alt="Happy">
+    
+</div>
+
+</div>
+                    <div class="playlist-header">
+                        <h3>Playlist</h3>
+                        <h1>Me?</h1>
+                        <p>2024 · OPM</p>
+                        <p style="margin-top: 10px;">**The Sou** · 3,456 likes · Date added: Today</p>
+                    </div>
+                </div>
+
+                <table class="song-list">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Title</th>
+                            <th>Artist</th>
+                            <th>Duration</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <style>
+                         body {
+      background-color: #121212; /* warna gelap seperti awal */
+      color: #ffffff;
+      font-family: 'Inter', sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+
+    table {
+      border-collapse: collapse;
+      width: 800px;
+    }
+
+    th, td {
+      padding: 12px 16px;
+      text-align: left;
+    }
+
+    th {
+      color: #b3b3b3;
+      font-weight: 500;
+      border-bottom: 1px solid #333;
+    }
+
+    tr {
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    tr:hover {
+      background-color: #1db95433; /* highlight saat hover */
+    }
+
+    td:last-child {
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+                        <table id="playlist">
+                        <tr><td>1</td><td>The Way I Loved You</td><td>Taylor swift (Taylor's Version </td><td>4:02</td></tr>
+                        <tr><td>2</td><td>Style</td><td>Taylor swift (Taylor's Version)</td><td>3:51</td></tr>
+                        <tr><td>3</td><td>Sejauh Dua Benua</td><td>Kahitna</td><td>3:45</td></tr>
+                        <tr><td>4</td><td>Tentang Diriku</td><td>Kahitna</td><td>3:18</td></tr>
+                        <tr><td>5</td><td>Wish List</td><td>Taylor Swift</td><td>3:27)</td></tr>
+
+                    </tbody>
+                </table>
+
+  <!-- audio tersembunyi -->
+  <audio id="audioPlayer"></audio>
+
+  <!-- SCRIPT HARUS DI SINI, DI BAWAH HTML -->
+  <script>
+    const audioFiles = [
+      "m1.mpeg",
+      "m2.mp4",
+      "m3.mp3",
+      "m4.mp4",
+      "m5.mp3"
+    ];
+
+    const player = document.getElementById("audioPlayer");
+    const rows = document.querySelectorAll("#playlist tr");
+
+    rows.forEach((row, index) => {
+      row.addEventListener("click", () => {
+        player.src = audioFiles[index];
+        player.play();
+      });
+    });
+  </script>
+
+            </section>
+
+            <section id="message-page" class="page">
+                <div class="message-box">
+                    <img src="18.jpeg" alt="" style="width: 150px; height: 150px; float: right; margin-left: 20px; border-radius: 50%;">
+                    <h2>Hey love,</h2>
+                    <p>Happy birthday, my love! 🎉
+                    I want to thank you for always being your amazing self. Keep going strong with finishing your thesis and earning your S.Pd degree—I know you can do it!</p>
+                    <p>Every effort you make, no matter how small, means so much, and I’m always proud of you. Keep chasing your dreams, don’t be afraid of challenges, because I’ll always be by your side, supporting you every step of the way.</p>
+                    <p>dreaming of. I believe you will achieve all that you set out to do! 💪✨</p>
+                    <h3 style="margin-top: 30px;">— Message from the creator</h3>
+                </div>
+            </section>
+
+            <section id="wrapped-page-1" class="wrapped-page">
+                <h1>2026</h1>
+                <h2>Munihh Birthdayy</h2>
+                <p style="margin-top: 10px;"></p>
+            </section>
+
+            <section id="wrapped-page-2" class="wrapped-page">
+              <section id="wrapped-page-2" class="wrapped-page">
+    <h2>has been alive for</h2>
+    <div class="countdown-timer">
+    <div class="timer-unit"><span id="timer-years">0</span> years</div>
+    <div class="timer-unit"><span id="timer-months">0</span> months</div>
+    <div class="timer-unit"><span id="timer-days">0</span> days</div>
+    <div class="timer-unit"><span id="timer-hours">0</span> hours</div>
+    <div class="timer-unit"><span id="timer-minutes">0</span> mins</div>
+    <div class="timer-unit"><span id="timer-seconds">0</span> secs</div>
+</div>
+    <h3 style="margin-top: 30px;">and still counting...</h3>
+</section>
+
+<script>
+const startDate = new Date("2004-01-18T00:00:00");
+
+function updateTimer() {
+    const now = new Date();
+    
+    let years = now.getFullYear() - startDate.getFullYear();
+    let months = now.getMonth() - startDate.getMonth();
+    let days = now.getDate() - startDate.getDate();
+
+    // Logika perbaikan hari jika tanggal sekarang lebih kecil dari tanggal lahir
+    if (days < 0) {
+        months--;
+        // Mengambil tanggal terakhir dari bulan sebelumnya
+        const prevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+        days += prevMonth.getDate();
+    }
+
+    // Perbaikan bulan jika bulan sekarang lebih kecil dari bulan lahir
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    // Ambil jam, menit, detik saat ini
+    const hours = now.getHours();
+    const minutes = now.getMinutes();
+    const seconds = now.getSeconds();
+
+    // Update elemen ke HTML
+    document.getElementById("timer-years").textContent = years;
+    document.getElementById("timer-months").textContent = months;
+    document.getElementById("timer-days").textContent = days; // Ini adalah sisa hari yang akurat
+    document.getElementById("timer-hours").textContent = hours;
+    document.getElementById("timer-minutes").textContent = minutes;
+    document.getElementById("timer-seconds").textContent = seconds;
+}
+
+// Jalankan fungsi setiap detik
+setInterval(updateTimer, 1000);
+updateTimer();
+</script>
+
+               
+
+            <section id="love-list-page" class="page">
+                <h1 style="margin-bottom: 40px;">5 Things About Munih in the Past Year</h1>
+                <div class="love-item"><span class="number">1</span>Your kind heart — you always care for others and bring warmth wherever you go.</div>
+                <div class="love-item"><span class="number">2</span>Your endless spirit — you keep going, always motivated and full of energy.</div>
+                <div class="love-item"><span class="number">3</span>Your strength — even when you're feeling down, you stay strong and face life bravely.</div>
+                <div class="love-item"><span class="number">4</span>Your playful side — even when you sulk a little, it only makes you more lovable.</div>
+                <div class="love-item"><span class="number">5</span>Your listening skills — you always listen with patience and truly understand</div>
+            </section>
+
+            <section id="moments-page" class="page">
+                <h1 style="margin-bottom: 40px;">Top Moments This Year</h1>
+                <div style="width: 100%; max-width: 600px; margin-left: 50px; text-align: left;">
+                    <div class="moment-item">
+    <span class="number">New Yearss</span>
+    <div class="moment-details">
+        <h4></h4>
+        <img src="3.jpeg" alt="Late-Night Call" class="moment-photo">
+    </div>
+</div>
+
+<div class="moment-item">
+    <span class="number">Bigu Festival</span>
+    <div class="moment-details">
+        <h4></h4>
+        <img src="14.jpeg" alt="Rainy Day" class="moment-photo">
+    </div>
+</div>
+
+<div class="moment-item">
+    <span class="number">Avatar Datee</span>
+    <div class="moment-details">
+        <h4></h4>
+        <img src="5.jpeg" alt="Birthday Surprise" class="moment-photo">
+    </div>
+</div>
+
+<div class="moment-item">
+    <span class="number">Graduation Helmiii</span>
+    <div class="moment-details">
+        <h4></h4>
+        <img src="9.jpeg" alt="Sunset Together" class="moment-photo">
+    </div>
+</div>
+
+<div class="moment-item">
+    <span class="number">Nyamnyammm</span>
+    <div class="moment-details">
+        <h4></h4>
+        <img src="7.jpeg" alt="First Trip" class="moment-photo">
+    </div>
+</div>
+
+            </section>
+
+            <section id="final-page" class="wrapped-page">
+                <h1>Thanks for listening to my heart all year.</h1>
+                <p style="margin-top: 20px; font-size: 1.5em;">Can't wait to spend another year with you. I love you!</p>
+                <button class="login-btn" style="width: 200px; background-color: var(--spotify-green);" onclick="scrollToSection('now-playing-page')">Home</button>
+            </section>
+
+        </div>
+    </div>
+
+    <script>
+        const CORRECT_PASSWORD = 'love'; // Use the password from the video (e.g., '1202') or a custom one.
+        const contentWrapper = document.getElementById('content-wrapper');
+        const loginPage = document.getElementById('login-page');
+        const mainContentArea = document.querySelector('.main-content');
+        const anniversaryDate = new Date('2024-02-12T00:00:00'); // Set your actual first meet date
+
+        function handleLogin() {
+            const passwordInput = document.getElementById('password-input').value.toLowerCase();
+            if (passwordInput === CORRECT_PASSWORD) {
+                loginPage.style.display = 'none';
+                contentWrapper.style.display = 'grid';
+                scrollToSection('now-playing-page'); // Start at the home screen
+                updateCountdown(); // Start the timer
+            } else {
+                alert('Wrong password. Try the special date or a term of endearment!');
+            }
+        }
+
+        function scrollToSection(id) {
+            const section = document.getElementById(id);
+            if (section) {
+                mainContentArea.scrollTo({
+                    top: section.offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+
+        function updateCountdown() {
+            const now = new Date();
+            let totalMonths = now.getMonth() - anniversaryDate.getMonth() + (12 * (now.getFullYear() - anniversaryDate.getFullYear()));
+            if (now.getDate() < anniversaryDate.getDate()) {
+                totalMonths--;
+            }
+
+            const totalDays = Math.floor((now - anniversaryDate) / (1000 * 60 * 60 * 24));
+
+            const years = Math.floor(totalMonths / 12);
+            const months = totalMonths % 12;
+            const weeks = Math.floor(totalDays / 7);
+
+            document.getElementById('timer-years').textContent = years;
+            document.getElementById('timer-months').textContent = months;
+            document.getElementById('timer-weeks').textContent = weeks;
+            document.getElementById('timer-days').textContent = totalDays;
+        }
+
+        // Initialize to show the login screen first
+        window.onload = () => {
+             contentWrapper.style.display = 'none';
+             loginPage.style.display = 'flex';
+             updateCountdown(); // Calculate once on load
+             setInterval(updateCountdown, 1000 * 60 * 60 * 24); // Update daily
+        };
+    </script>
+    <script>
+  // daftar file audio sesuai urutan baris tabel
+  const audioFiles = [
+    "foto/mp1.mpeg",
+    "audio/style.mp3",
+    "audio/sejauh-dua-benua.mp3",
+    "audio/tentang-diriku.mp3",
+    "audio/wish-list.mp3"
+  ];
+
+  const player = document.getElementById("audioPlayer");
+  const rows = document.querySelectorAll("#playlist tr");
+
+  rows.forEach((row, index) => {
+    row.addEventListener("click", () => {
+      player.src = audioFiles[index]; // pilih file sesuai baris
+      player.play();
+    });
+  });
+</script>
+
+</body>
+</html>
